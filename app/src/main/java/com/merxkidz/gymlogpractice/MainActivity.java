@@ -1,5 +1,6 @@
 package com.merxkidz.gymlogpractice;
 
+import android.app.Application;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -7,13 +8,16 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.merxkidz.gymlogpractice.database.GymLogRepository;
+import com.merxkidz.gymlogpractice.database.entities.GymLog;
 import com.merxkidz.gymlogpractice.databinding.ActivityMainBinding;
 
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    ActivityMainBinding binding;
+    private ActivityMainBinding binding;
+    private GymLogRepository repository;
 
     public static final String TAG = "DAC_GYMLOG";
     String mExercise = "";
@@ -26,16 +30,24 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        repository = GymLogRepository.getRepository(getApplication());
+
         binding.logDisplayTextView.setMovementMethod(new ScrollingMovementMethod());
 
         binding.logButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getInformationFromDisplay();
+                insertGymlogRecord();
                 updateDisplay();
             }
         });
 
+    }
+
+    private void insertGymlogRecord(){
+        GymLog log = new GymLog(mExercise,mWeight,mReps);
+        repository.insertGymLog(log);
     }
 
     private void updateDisplay(){
@@ -43,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "curent info: "+currentInfo);
         String newDisplay = String.format(Locale.US,"Exercise:%s%nWeight:%.2f%nReps:%d%n=-=-=-=%n%s",mExercise,mWeight,mReps,currentInfo);
         binding.logDisplayTextView.setText(newDisplay);
+        Log.i(TAG,repository.getAllLogs().toString());
     }
 
     private void getInformationFromDisplay() {
