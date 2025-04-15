@@ -48,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // the repository needed to be before the loginUser; otherwise, it crashes the application
+        repository = GymLogRepository.getRepository(getApplication());
+
         loginUser();
 
         if(loggedInUserId == -1){
@@ -55,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         }
 
-        repository = GymLogRepository.getRepository(getApplication());
         binding.logDisplayTextView.setMovementMethod(new ScrollingMovementMethod());
         updateDisplay();
         binding.logButton.setOnClickListener(new View.OnClickListener() {
